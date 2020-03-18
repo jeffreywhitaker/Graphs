@@ -1,5 +1,18 @@
 import random
 
+class Queue():
+    def __init__(self):
+        self.queue = []
+    def enqueue(self, value):
+        self.queue.append(value)
+    def dequeue(self):
+        if self.size() > 0:
+            return self.queue.pop(0)
+        else:
+            return None
+    def size(self):
+        return len(self.queue)
+
 class User:
     def __init__(self, name):
         self.name = name
@@ -69,6 +82,44 @@ class SocialGraph:
             friendship = possible_friendships[i]
             self.add_friendship(friendship[0], friendship[1])
 
+    def get_neighbors(self, vertex):
+        return self.friendships[vertex]
+
+    def bfs(self, starting_vertex, destination_vertex):
+        """
+        Return a list containing the shortest path from
+        starting_vertex to destination_vertex in
+        breath-first order.
+        """
+        # Create a queue
+        q = Queue()
+        # Enqueue A PATH TO the starting vertex
+        q.enqueue([starting_vertex])
+        # Create a set to store visited vertices
+        visited = set()
+        # While the queue is not empty...
+        while q.size() > 0:
+            # Dequeue the first PATH
+            path = q.dequeue()
+            # GRAB THE VERTEX FROM THE END OF THE PATH
+            vertex = path[-1]
+            # Check if it's been visited
+            # If it hasn't been visited...
+            if vertex not in visited:
+                # Mark it as visited
+                visited.add(vertex)
+                # CHECK IF IT'S THE TARGET
+                if vertex == destination_vertex:
+                    # IF SO, RETURN THE PATH
+                    return path
+                # Enqueue A PATH TO all it's neighbors
+                for neighbor in self.get_neighbors(vertex):
+                    # MAKE A COPY OF THE PATH
+                    path_copy = path.copy()
+                    # append neighbor
+                    path_copy.append(neighbor)
+                    # ENQUEUE THE COPY
+                    q.enqueue(path_copy)
 
     def get_all_social_paths(self, user_id):
         """
@@ -81,12 +132,25 @@ class SocialGraph:
         """
         visited = {}  # Note that this is a dictionary, not a set
         # !!!! IMPLEMENT ME
+
+        # for each user
+        for user in self.users:
+            # get the correct user
+            if user == user_id:
+                # for each friend
+                for user in self.users:
+                    # run a bfs
+                    shortest_path = self.bfs(user_id, user)
+                    # save the shortest route
+                    # put shortest route in visitted dict
+                    visited[user] = shortest_path
+        # return the completed dict
         return visited
 
 
 if __name__ == '__main__':
     sg = SocialGraph()
     sg.populate_graph(10, 2)
-    print(sg.friendships)
-    # connections = sg.get_all_social_paths(1)
-    # print(connections)
+    # print(sg.friendships)
+    connections = sg.get_all_social_paths(1)
+    print('connections: ', connections)
