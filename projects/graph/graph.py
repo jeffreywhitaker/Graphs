@@ -223,7 +223,7 @@ class Graph:
                     possible_answer = dfs_recursive_helper(path_copy)
                     if (possible_answer is not None):
                         return possible_answer
-            return None
+            # return None
 
         # Check if the node has been visited
         current_path = [starting_vertex]
